@@ -1,0 +1,102 @@
+<div name="home-header">
+    <div class="col-md-8">
+        <img src="/images/rick-morty.png" class="img-responsive center-block"/>
+    </div>
+    <div class="col-md-4 search-form">
+        <h3 class="search-title">Search for a character</h3>
+        <form role="form" method="get" action="/home/index">
+            <div class="form-group row">
+                <label for="inputEmail" class="col-sm-2 col-form-label">Name</label>
+                <div class="col-md-6">
+                    <input type="text" class="form-control" id="inputEmail" name="name" placeholder="Enter name of a character">
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="inputUser" class="col-sm-2 col-form-label">Status</label>
+                <div class="col-md-6">
+                    <select class="form-control" type="dropdown" name="status">
+                        <option value="">None</option>
+                        <option value="alive">Alive</option>
+                        <option value="dead">Dead</option>
+                        <option value="unknown">Unknown</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <label for="inputPassword3" class="col-sm-2 col-form-label">Gender</label>
+                <div class="col-md-6">
+                    <select class="form-control" type="dropdown" name="gender">
+                        <option value="">None</option>
+                        <option value="female">Female</option>
+                        <option value="male">Male</option>
+                        <option value="genderless">Genderless</option>
+                        <option value="unknown">Unknown</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="offset-sm-2 col-sm-10">
+                    <input type="submit" value="Search" name="submit" class="btn btn-primary"/>
+                    <a href="/" class="btn btn-primary">Reset</a>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-12 rendered-cards">
+        <div class="rendered-characters">
+            <?php if(!empty($data) && !isset($data->error)): ?>
+            <div class="rendered-cards--header col-md-12">
+                <h3>Number of Results: <?= ($data->info->count); ?></h3>
+            </div>
+            <div class="rendered-cards--results col-md-12" id="results">
+                <?php foreach($data->results as $result): ?>
+                <div class="card" id="<?= $data->info->next ?>">
+                    <div class="card-image--wrapper">
+                        <img class="card-image" src="<?=  $result->image; ?>" alt="<?=  $result->name; ?>">
+                    </div>
+                    <div class="card-body">
+                        <h2><span>#<?=  $result->id; ?></span> <?=  $result->name; ?></h2>
+                        <h3><?=  $result->status. ' '.$result->species.' '.$result->gender; ?></h3>
+                        <p>Last known location:</p>
+                        <p class="location"><?= $result->location->name; ?></p>
+                        <p>First seen in:</p>
+                        <a href="<?= $result->episode[0]; ?>"><?= $result->episode[0]; ?></a>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <?php else: ?>
+                <div class="rendered-cards--header col-md-12">
+                    <h3>No results found :(</h3>
+                </div>
+            <?php endif; ?>
+        </div>
+        <div class="ajax-load">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+</div>
+<script>
+    $('.ajax-load').hide();
+    $(window).scroll(function() {
+        if($(window).scrollTop() + $(window).height() > $(document).height() - 700) {
+            var last_id = $(".card:last").attr("id");
+            loadMore(last_id);
+        }
+    });
+
+    function loadMore(last_id){
+        $.ajax({
+            url: '/load-more/index?page='+ last_id,
+            type: "get",
+            beforeSend: function(){
+                $('.ajax-load').show();
+            }
+        }).done(function(data){
+            $('.ajax-load').hide();
+            $("#results").append(data);
+        }).fail(function(jqXHR, ajaxOptions, thrownError){
+            alert('server not responding...');
+        });
+    }
+</script>

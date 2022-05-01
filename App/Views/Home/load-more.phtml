@@ -1,0 +1,17 @@
+<?php if(!empty($data)): ?>
+<?php foreach($data->results as $result): ?>
+    <div class="card" id="<?= $data->info->next ?>">
+        <div class="card-image--wrapper">
+            <img class="card-image" src="<?=  $result->image; ?>" alt="<?=  $result->name; ?>">
+        </div>
+        <div class="card-body">
+            <h2><span>#<?=  $result->id; ?></span> <?=  $result->name; ?></h2>
+            <h3><?=  $result->status. ' '.$result->species.' '.$result->gender; ?></h3>
+            <p>Last known location:</p>
+            <p class="location"><?= $result->location->name; ?></p>
+            <p>First seen in:</p>
+            <a href="<?= $result->episode[0]; ?>"><?= $result->episode[0]; ?></a>
+        </div>
+    </div>
+<?php endforeach; ?>
+<?php endif; ?>
